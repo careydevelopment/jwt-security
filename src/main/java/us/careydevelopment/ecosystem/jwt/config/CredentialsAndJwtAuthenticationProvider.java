@@ -16,11 +16,11 @@ import us.careydevelopment.ecosystem.jwt.service.JwtUserDetailsService;
 import us.careydevelopment.ecosystem.jwt.util.JwtTokenUtil;
 
 /**
- * Handles authentication with a JWT instead of name/password
+ * Handles authentication with a JWT or name/password
  */
-public abstract class JwtAuthenticationProvider implements AuthenticationProvider {
+public abstract class CredentialsAndJwtAuthenticationProvider implements AuthenticationProvider {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JwtAuthenticationProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CredentialsAndJwtAuthenticationProvider.class);
 
     protected JwtUserDetailsService jwtUserDetailsService;
     
