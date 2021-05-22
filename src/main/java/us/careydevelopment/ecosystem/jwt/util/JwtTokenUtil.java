@@ -1,13 +1,19 @@
 package us.careydevelopment.ecosystem.jwt.util;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import us.careydevelopment.ecosystem.jwt.model.BaseUser;
@@ -94,5 +100,27 @@ public abstract class JwtTokenUtil {
     //no return necessary as this will throw an exception if there's a problem
     public void validateTokenWithSignature(String token) {
         Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+    }
+    
+    
+    public Collection<? extends GrantedAuthority> getAuthorities(String token) {
+        Jws<Claims> jwsClaims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+        Claims claims = jwsClaims.getBody();
+        System.err.println("suject is " + claims.getSubject());
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(claims); 
+        
+        return authorities;
+    }
+    
+    
+    private Collection<? extends GrantedAuthority> getAuthorities(Claims claims) {
+        List<String> authorityNames = (List<String>) claims.get("authorities");
+        
+        Collection<? extends GrantedAuthority> authorities = authorityNames
+            .stream()
+            .map(auth -> new SimpleGrantedAuthority(auth))
+            .collect(Collectors.toList());
+
+        return authorities;
     }
 }

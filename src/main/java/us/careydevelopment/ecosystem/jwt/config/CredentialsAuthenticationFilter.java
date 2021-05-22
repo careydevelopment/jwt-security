@@ -24,7 +24,6 @@ import us.careydevelopment.ecosystem.jwt.util.JwtTokenUtil;
 
 /**
  * Users asking for access with a name and password get here
- *
  */
 public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     
@@ -40,7 +39,7 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
      * @param jwtUtil - Spring-managed component
      */
     public CredentialsAuthenticationFilter(AuthenticationManager man, JwtTokenUtil jwtUtil) {
-        this.authenticationManager = man;
+        this.authenticationManager = man;        
         this.jwtUtil = jwtUtil;        
         this.setFilterProcessesUrl("/authenticate");
     }
