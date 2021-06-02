@@ -1,6 +1,7 @@
 package us.careydevelopment.ecosystem.jwt.config;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
@@ -8,7 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,6 +26,7 @@ import us.careydevelopment.ecosystem.jwt.model.BaseUser;
 import us.careydevelopment.ecosystem.jwt.model.JwtRequest;
 import us.careydevelopment.ecosystem.jwt.service.JwtUserDetailsService;
 import us.careydevelopment.ecosystem.jwt.util.MultiReadHttpServletRequest;
+import us.careydevelopment.ecosystem.jwt.util.ResponseWriterUtil;
 import us.careydevelopment.util.date.DateConversionUtil;
 
 @Component
@@ -48,7 +50,8 @@ public class TooManyFailedRequestsFilter extends OncePerRequestFilter {
                                     throws ServletException, IOException {
 
         boolean allowedIn = true;
-        System.err.println("In here the failed");
+    
+        System.err.println("Checking for too many requests");
         
         if (HttpMethod.POST.name().equals(request.getMethod())) {
             try {
@@ -74,8 +77,15 @@ public class TooManyFailedRequestsFilter extends OncePerRequestFilter {
             }
         }
         
+        System.err.println("allowedin is " + allowedIn);
+        
         if (!allowedIn) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Too many failed login attempts. Please try again tomorrow.");
+            System.err.println("Going here");
+            //response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Too many failed login attempts. Please try again tomorrow.");
+            
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());                
+            ResponseWriterUtil.writeErrorResponse(response, "Too many failed login attempts. Please try again tomorrow");
         } else {
             filterChain.doFilter(request, response);            
         }

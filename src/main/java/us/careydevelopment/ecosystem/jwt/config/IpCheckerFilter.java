@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -63,7 +62,7 @@ public class IpCheckerFilter extends OncePerRequestFilter {
         }
       
         if (!proceed) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "You're not authorized to access this resource.");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You're not authorized to access this resource.");
         } else {
             filterChain.doFilter(request, response);
         }

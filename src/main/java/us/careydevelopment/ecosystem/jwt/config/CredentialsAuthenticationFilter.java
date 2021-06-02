@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +21,7 @@ import us.careydevelopment.ecosystem.jwt.exception.UserServiceAuthenticationExce
 import us.careydevelopment.ecosystem.jwt.model.BaseUser;
 import us.careydevelopment.ecosystem.jwt.model.JwtRequest;
 import us.careydevelopment.ecosystem.jwt.model.JwtResponse;
+import us.careydevelopment.ecosystem.jwt.service.JwtUserDetailsService;
 import us.careydevelopment.ecosystem.jwt.util.JwtTokenUtil;
 
 /**
@@ -31,6 +33,7 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
 
     protected AuthenticationManager authenticationManager;    
     protected JwtTokenUtil jwtUtil;
+    protected JwtUserDetailsService jwtUserDetailsService;
     
     
     /**
@@ -39,25 +42,43 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
      * @param man - standard Java class
      * @param jwtUtil - Spring-managed component
      */
-    public CredentialsAuthenticationFilter(AuthenticationManager man, JwtTokenUtil jwtUtil) {
+    public CredentialsAuthenticationFilter(AuthenticationManager man) {
         this.authenticationManager = man;        
-        this.jwtUtil = jwtUtil;        
         this.setFilterProcessesUrl("/authenticate");
+    }
+
+    
+    public void setJwtTokenUtil(JwtTokenUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+    
+    
+    public void setUserDetailsService(JwtUserDetailsService jwtUserDetailsService) {
+        this.jwtUserDetailsService = jwtUserDetailsService;
     }
     
     
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
         Authentication auth = null;
+        JwtRequest jwtRequest = null;
         
         try {
             //translate the input to a request for a JWT
-            JwtRequest jwtRequest = new ObjectMapper().readValue(req.getInputStream(), JwtRequest.class);
+            jwtRequest = new ObjectMapper().readValue(req.getInputStream(), JwtRequest.class);
             LOG.debug("The JWT request is " + jwtRequest);
        
-            //use authentication manager to validate credentials
-            auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    jwtRequest.getUsername(), jwtRequest.getPassword()));
+            if (jwtRequest != null) {
+                //use authentication manager to validate credentials
+                auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                        jwtRequest.getUsername(), jwtRequest.getPassword()));                
+            } else {
+                throw new UserServiceAuthenticationException("Problem getting login credentials!");
+            }
+        } catch (BadCredentialsException e) {
+            LOG.error("Bad credentials!", e);
+            jwtUserDetailsService.updateFailedLoginAttempts(jwtRequest.getUsername());
+            throw new UserServiceAuthenticationException(e.getMessage());
         } catch (Exception e) {
             LOG.error("Problem logging in user with credentials!", e);
             throw new UserServiceAuthenticationException(e.getMessage());

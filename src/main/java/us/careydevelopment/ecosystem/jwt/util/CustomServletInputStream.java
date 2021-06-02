@@ -32,8 +32,6 @@ public class CustomServletInputStream extends ServletInputStream {
 
     @Override
     public boolean isReady() {
-        // This implementation will never block
-        // We also never need to call the readListener from this method, as this method will never return false
         return isFinished();
     }
 

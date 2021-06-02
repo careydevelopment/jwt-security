@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
@@ -13,14 +12,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import us.careydevelopment.ecosystem.jwt.service.JwtUserDetailsService;
+
 /**
  * This class gets extended in the Spring Boot application
  * Handles security config for applications that support user login and JWT 
  */
 public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig  {
 
-    protected UserDetailsService jwtUserDetailsService;
-
+    protected JwtUserDetailsService jwtUserDetailsService;
+    
         
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -79,9 +80,11 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
      * @throws Exception
      */
     protected CredentialsAuthenticationFilter credentialsAuthenticationFilter() throws Exception {
-        CredentialsAuthenticationFilter filter = new CredentialsAuthenticationFilter(authenticationManager(), jwtUtil);
+        CredentialsAuthenticationFilter filter = new CredentialsAuthenticationFilter(authenticationManager());
         filter.setAuthenticationFailureHandler(authenticationFailureHandler());
-
+        filter.setJwtTokenUtil(jwtUtil);
+        filter.setUserDetailsService(jwtUserDetailsService);
+        
         return filter;
     }
                     

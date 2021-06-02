@@ -1,9 +1,12 @@
 package us.careydevelopment.ecosystem.jwt.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import us.careydevelopment.ecosystem.jwt.model.BaseUser;
 import us.careydevelopment.ecosystem.jwt.repository.UserDetailsRepository;
 
 /**
@@ -14,6 +17,9 @@ import us.careydevelopment.ecosystem.jwt.repository.UserDetailsRepository;
  */
 public abstract class JwtUserDetailsService implements UserDetailsService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JwtUserDetailsService.class);
+
+    
     protected UserDetailsRepository userDetailsRepository;
 
     
@@ -37,4 +43,7 @@ public abstract class JwtUserDetailsService implements UserDetailsService {
             }
         }
     }    
+    
+    
+    public abstract void updateFailedLoginAttempts(String username);
 }

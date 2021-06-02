@@ -5,7 +5,7 @@
     <name>JWT Security</name>
     <description>Library for handling security-related concerns for the Carey Development ecosystem</description>
     <url>https://github.com/careydevelopment/jwt-security</url>
-    <version>1.2.1-SNAPSHOT</version> 
+    <version>1.2.0-RELEASE</version> 
     
     <dependencies>
 		<dependency>
