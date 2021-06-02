@@ -14,9 +14,6 @@ import us.careydevelopment.ecosystem.jwt.repository.UserDetailsRepository;
  */
 public abstract class JwtUserDetailsService implements UserDetailsService {
 
-    //Generic repo representation with only a couple of methods:
-    //findByUsername()
-    //findByEmail()
     protected UserDetailsRepository userDetailsRepository;
 
     

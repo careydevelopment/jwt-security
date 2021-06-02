@@ -32,6 +32,7 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     protected AuthenticationManager authenticationManager;    
     protected JwtTokenUtil jwtUtil;
     
+    
     /**
      * Instantiated from the Spring Boot application
      * 
@@ -53,7 +54,7 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
             //translate the input to a request for a JWT
             JwtRequest jwtRequest = new ObjectMapper().readValue(req.getInputStream(), JwtRequest.class);
             LOG.debug("The JWT request is " + jwtRequest);
-            
+       
             //use authentication manager to validate credentials
             auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     jwtRequest.getUsername(), jwtRequest.getPassword()));

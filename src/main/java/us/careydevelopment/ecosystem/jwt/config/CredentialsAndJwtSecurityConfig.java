@@ -19,9 +19,8 @@ import org.springframework.web.filter.CorsFilter;
  */
 public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig  {
 
-    
     protected UserDetailsService jwtUserDetailsService;
-    
+
         
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -71,7 +70,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
             
         return filter;
     }
-        
+    
     
     /**
      * This filter handles name/password authentication
@@ -85,7 +84,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
 
         return filter;
     }
-                
+                    
         
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {              
@@ -93,7 +92,8 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
             .cors().and()
             .csrf().disable()
             .addFilter(bearerTokenAuthenticationFilter())
-            .addFilter(credentialsAuthenticationFilter())       
+            .addFilter(credentialsAuthenticationFilter())
+            //.addFilterBefore(ipCheckerFilter, BearerTokenAuthenticationFilter.class)
             .authorizeRequests()
             .anyRequest().hasAnyAuthority(allowedAuthorities).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
