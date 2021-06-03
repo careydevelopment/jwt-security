@@ -1,6 +1,7 @@
 package us.careydevelopment.ecosystem.jwt.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -71,6 +72,7 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
             } else if (ex instanceof TooManyFailedLoginsAuthenticationException) {
                 ResponseUtil.tooManyFailedLogins(response);
             } else {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 ResponseWriterUtil.writeResponse(response, ex.getMessage(), ResponseStatusCode.UNAUTHORIZED);                                  
             }
         };
@@ -88,3 +90,4 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }   
 }
+ 
