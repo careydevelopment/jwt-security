@@ -8,10 +8,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
+import us.careydevelopment.ecosystem.jwt.model.IpTracker;
 import us.careydevelopment.ecosystem.jwt.service.JwtUserDetailsService;
 
 /**
@@ -21,6 +19,7 @@ import us.careydevelopment.ecosystem.jwt.service.JwtUserDetailsService;
 public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig  {
 
     protected JwtUserDetailsService jwtUserDetailsService;
+    protected IpTracker ipTracker;
     
         
     @Autowired
@@ -33,27 +32,6 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-
-    /**
-     * For now, we're relying on IpCheckerInterceptor rather than CORS.
-     * That's because Kubernetes assigns new ports with each pod.
-     * We just need to check the IP address whereas CORS looks at ports too.
-     * 
-     * @return corsFilter
-     */
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        
-        return new CorsFilter(source);
     }
         
     
@@ -84,10 +62,11 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
         filter.setAuthenticationFailureHandler(authenticationFailureHandler());
         filter.setJwtTokenUtil(jwtUtil);
         filter.setUserDetailsService(jwtUserDetailsService);
+        filter.setIpTracker(ipTracker);
         
         return filter;
     }
-                    
+
         
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {              
@@ -96,7 +75,6 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
             .csrf().disable()
             .addFilter(bearerTokenAuthenticationFilter())
             .addFilter(credentialsAuthenticationFilter())
-            //.addFilterBefore(ipCheckerFilter, BearerTokenAuthenticationFilter.class)
             .authorizeRequests()
             .anyRequest().hasAnyAuthority(allowedAuthorities).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

@@ -6,7 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import us.careydevelopment.ecosystem.jwt.model.BaseUser;
 import us.careydevelopment.ecosystem.jwt.repository.UserDetailsRepository;
 
 /**
@@ -46,4 +45,6 @@ public abstract class JwtUserDetailsService implements UserDetailsService {
     
     
     public abstract void updateFailedLoginAttempts(String username);
+    
+    public abstract void successfulLogin(String username);
 }

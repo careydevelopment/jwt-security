@@ -18,8 +18,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import us.careydevelopment.util.api.response.ResponseUtil;
+
+/**
+ * This class makes sure the requests come to us from an allowed IP address
+ * 
+ * Note: this class does NOT check for max failed login attempts from a single IP address.
+ * That occurs in CredentialsAuthenticationFilter with the help of IpTracker.
+ * 
+ * Going this route instead of doing the CORS thing because in a Kubernetes cluster each
+ * request gets a new port. That makes it difficult (to say the least) to define valid
+ * origins.
+ */
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class IpCheckerFilter extends OncePerRequestFilter {
     
     private static final String ALLOWED_ORIGIN = "https://bixis.us";
@@ -62,7 +74,7 @@ public class IpCheckerFilter extends OncePerRequestFilter {
         }
       
         if (!proceed) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You're not authorized to access this resource.");
+            ResponseUtil.badOrigin(response);
         } else {
             filterChain.doFilter(request, response);
         }
