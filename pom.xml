@@ -5,7 +5,7 @@
     <name>JWT Security</name>
     <description>Library for handling security-related concerns for the Carey Development ecosystem</description>
     <url>https://github.com/careydevelopment/jwt-security</url>
-    <version>1.1.0-RELEASE</version> 
+    <version>1.2.0-RELEASE</version> 
     
     <dependencies>
         <dependency>
@@ -53,7 +53,16 @@
 		    <artifactId>tomcat-embed-core</artifactId>
 		    <version>9.0.46</version>
 		</dependency>
-		
+        <dependency>
+            <groupId>us.careydevelopment.util</groupId>
+            <artifactId>date-util</artifactId>
+            <version>1.2.0-RELEASE</version>
+        </dependency>		
+        <dependency>
+            <groupId>us.careydevelopment.util</groupId>
+            <artifactId>api-util</artifactId>
+            <version>1.1.0-RELEASE</version>
+        </dependency>       
     </dependencies>
     
     <properties>
@@ -69,7 +78,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.2.0</version>
             </plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <version>1.6.7</version>
@@ -123,7 +132,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> -->
         </plugins>
         <finalName>${project.artifactId}</finalName>
     </build>

@@ -23,6 +23,9 @@ public abstract class BaseUser implements UserDetails {
 
     @JsonIgnore
     protected List<String> authorityNames = new ArrayList<String>();
+
+    protected Integer failedLoginAttempts;
+    protected Long lastFailedLoginTime;
     
     public String getId() {
         return id;
@@ -39,7 +42,19 @@ public abstract class BaseUser implements UserDetails {
     public List<String> getAuthorityNames() {
         return authorityNames;
     }
-
+    
+    public Integer getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+    public void setFailedLoginAttempts(Integer failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+    public Long getLastFailedLoginTime() {
+        return lastFailedLoginTime;
+    }
+    public void setLastFailedLoginTime(Long lastFailedLoginTime) {
+        this.lastFailedLoginTime = lastFailedLoginTime;
+    }
     public void setAuthorityNames(List<String> authorityNames) {
         this.authorityNames = authorityNames;
     }

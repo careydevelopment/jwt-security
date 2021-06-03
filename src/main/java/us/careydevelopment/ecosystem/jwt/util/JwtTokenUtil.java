@@ -17,10 +17,11 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import us.careydevelopment.ecosystem.jwt.model.BaseUser;
+import us.careydevelopment.util.date.DateConversionUtil;
 
 public abstract class JwtTokenUtil {
 
-    protected static long JWT_TOKEN_VALIDITY = 24 * 60 * 60 * 1000;
+    protected static long JWT_TOKEN_VALIDITY = DateConversionUtil.NUMBER_OF_MILLISECONDS_IN_DAY;
 	
     protected String jwtSecret;
 
