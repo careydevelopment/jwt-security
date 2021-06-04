@@ -107,7 +107,6 @@ public abstract class JwtTokenUtil {
     public Collection<? extends GrantedAuthority> getAuthorities(String token) {
         Jws<Claims> jwsClaims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
         Claims claims = jwsClaims.getBody();
-        System.err.println("suject is " + claims.getSubject());
         Collection<? extends GrantedAuthority> authorities = getAuthorities(claims); 
         
         return authorities;

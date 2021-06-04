@@ -12,4 +12,5 @@ public abstract class JwtOnlySecurityConfig extends BaseSecurityConfig {
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider);
     }
+    
 }
