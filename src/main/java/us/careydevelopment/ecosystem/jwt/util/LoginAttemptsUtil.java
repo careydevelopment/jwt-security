@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import us.careydevelopment.ecosystem.jwt.exception.TooManyFailedIpLoginsAuthenticationException;
 import us.careydevelopment.ecosystem.jwt.exception.TooManyFailedLoginsAuthenticationException;
@@ -83,7 +84,7 @@ public class LoginAttemptsUtil {
         String ipAddress = request.getRemoteAddr();
         
         //timeframe in the past 24 hours
-        Long timeframe = System.currentTimeMillis() - DateConversionUtil.NUMBER_OF_MILLISECONDS_IN_DAY;
+        Long timeframe = System.currentTimeMillis() - FAILED_LOGIN_TIMEOUT_PERIOD;
         
         List<? extends BaseIpLog> list = ipTracker.fetchIpFailureRecord(ipAddress, timeframe);
         if (list != null && list.size() >= MAX_FAILED_LOGINS) {
