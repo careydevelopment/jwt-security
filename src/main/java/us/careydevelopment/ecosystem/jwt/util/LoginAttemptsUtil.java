@@ -45,16 +45,12 @@ public class LoginAttemptsUtil {
     public void checkMaxLoginAttempts(JwtRequest jwtRequest) {
         LOG.debug("Checking for too many failed logins");
         
-        try {
-            if (jwtRequest != null && jwtRequest.getUsername() != null) {
-                BaseUser user = (BaseUser)jwtUserDetailsService.loadUserByUsername(jwtRequest.getUsername());        
-                checkForFailedLogins(user);
-            } else {
-                throw new UserServiceAuthenticationException("Can't parse login request!");
-            }
-        } catch (Exception e) {
-            throw new UserServiceAuthenticationException("Problem logging in!");
-        }        
+        if (jwtRequest != null && jwtRequest.getUsername() != null) {
+            BaseUser user = (BaseUser)jwtUserDetailsService.loadUserByUsername(jwtRequest.getUsername());        
+            checkForFailedLogins(user);
+        } else {
+            throw new UserServiceAuthenticationException("Can't parse login request!");
+        }
     }
     
     
