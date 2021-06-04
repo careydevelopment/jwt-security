@@ -1,6 +1,7 @@
 package us.careydevelopment.ecosystem.jwt.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -9,6 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import us.careydevelopment.ecosystem.jwt.constants.Authority;
 import us.careydevelopment.ecosystem.jwt.exception.InvalidCredentialsAuthenticationException;
@@ -88,6 +92,27 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .anyRequest().hasAnyAuthority(allowedAuthorities).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }   
+    }
+    
+    
+    /**
+     * For now, we're relying on IpCheckerFilter rather than CORS.
+     * That's because Kubernetes assigns new ports with each pod.
+     * We just need to check the IP address whereas CORS looks at ports too.
+     * 
+     * @return corsFilter
+     */
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        
+        return new CorsFilter(source);
+    }
 }
  
