@@ -90,6 +90,7 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .addFilter(bearerTokenAuthenticationFilter())
             .authorizeRequests()
+            .antMatchers("/check/**").permitAll()
             .anyRequest().hasAnyAuthority(allowedAuthorities).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }

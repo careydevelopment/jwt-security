@@ -67,7 +67,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
         return filter;
     }
 
-        
+
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {              
         httpSecurity
@@ -76,6 +76,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
             .addFilter(bearerTokenAuthenticationFilter())
             .addFilter(credentialsAuthenticationFilter())
             .authorizeRequests()
+            .antMatchers("/check/**").permitAll()
             .anyRequest().hasAnyAuthority(allowedAuthorities).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }   
