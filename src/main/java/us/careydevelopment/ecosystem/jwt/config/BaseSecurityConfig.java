@@ -31,12 +31,15 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
 
     //this can be overridden in the child class
     //TODO: probably use an ecosystem generic user rather than CRM-specific
-    protected String[] allowedAuthorities = {Authority.CRM_USER};    
-
- 
+    private String[] allowedAuthorities = { Authority.CRM_USER };    
+    
     protected AuthenticationProvider authenticationProvider;
     protected JwtTokenUtil jwtUtil;
 
+    protected String[] getAllowedAuthorities() {
+        return allowedAuthorities;
+    }
+    
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -91,7 +94,7 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilter(bearerTokenAuthenticationFilter())
             .authorizeRequests()
             .antMatchers("/check/**").permitAll()
-            .anyRequest().hasAnyAuthority(allowedAuthorities).and()
+            .anyRequest().hasAnyAuthority(getAllowedAuthorities()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
     

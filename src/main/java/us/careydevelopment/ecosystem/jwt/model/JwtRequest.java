@@ -4,33 +4,42 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 public class JwtRequest {
 	
-	private String username;
-	private String password;	
+    private String username;
+    private String password;	
+    private Boolean setCookie = false;
 	
-	public JwtRequest() { }
+    public JwtRequest() { }
 
-	public JwtRequest(String username, String password) {
-		this.setUsername(username);
-		this.setPassword(password);
-	}
+    public JwtRequest(String username, String password) {
+        this.setUsername(username);
+        this.setPassword(password);
+    }
 
-	public String getUsername() {
-		return this.username;
-	}
+    public String getUsername() {
+        return this.username;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public String getPassword() {
-		return this.password;
-	}
+    public String getPassword() {
+        return this.password;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	public String toString() {
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public Boolean getSetCookie() {
+        return setCookie;
+    }
+
+    public void setSetCookie(Boolean setCookie) {
+        this.setCookie = setCookie;
+    }
+
+    public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
 }
