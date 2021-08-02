@@ -58,5 +58,4 @@ public abstract class BaseUser implements UserDetails {
     public void setAuthorityNames(List<String> authorityNames) {
         this.authorityNames = authorityNames;
     }
-    
 }

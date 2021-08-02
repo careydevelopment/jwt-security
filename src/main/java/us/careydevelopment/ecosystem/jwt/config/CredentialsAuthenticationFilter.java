@@ -3,6 +3,7 @@ package us.careydevelopment.ecosystem.jwt.config;
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import us.careydevelopment.ecosystem.jwt.constants.CookieConstants;
 import us.careydevelopment.ecosystem.jwt.exception.InvalidCredentialsAuthenticationException;
 import us.careydevelopment.ecosystem.jwt.exception.UserServiceAuthenticationException;
 import us.careydevelopment.ecosystem.jwt.model.BaseUser;
@@ -39,6 +41,8 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     protected JwtTokenUtil jwtUtil;
     protected JwtUserDetailsService jwtUserDetailsService;
     protected IpTracker ipTracker;
+    
+    private Boolean createCookie = false;
     
     
     /**
@@ -114,6 +118,8 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
         Authentication auth = null;
         
         if (jwtRequest != null) {
+            this.createCookie = jwtRequest.getSetCookie();
+            
             //use authentication manager to validate credentials
             auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     jwtRequest.getUsername(), jwtRequest.getPassword()));
@@ -128,11 +134,16 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, 
             FilterChain chain, Authentication auth) throws IOException {
-        
+
         final BaseUser user = (BaseUser)auth.getPrincipal();
         final String token = jwtUtil.generateToken(user);
         final Long expirationDate = jwtUtil.getExpirationDateFromToken(token).getTime();
 
+        if (createCookie) {
+            Cookie cookie = createCookie(token);
+            res.addCookie(cookie);            
+        }
+        
         //log a successful authentication to iplog collection
         ipTracker.successfulLogin(user.getUsername(), req.getRemoteAddr());
         
@@ -146,5 +157,16 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
         
         res.getWriter().write(body);
         res.getWriter().flush();
+    }
+    
+    
+    private Cookie createCookie(final String content) {
+        final Cookie cookie = new Cookie(CookieConstants.ACCESS_TOKEN_COOKIE_NAME, content);
+        
+        cookie.setMaxAge((int)JwtTokenUtil.JWT_TOKEN_VALIDITY);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+                
+        return cookie;
     }
 }
