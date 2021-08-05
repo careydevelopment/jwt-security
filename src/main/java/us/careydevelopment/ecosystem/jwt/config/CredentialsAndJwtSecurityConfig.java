@@ -77,6 +77,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
             .addFilter(credentialsAuthenticationFilter())
             .authorizeRequests()
             .antMatchers("/check/**").permitAll()
+            .antMatchers("/user/simpleSearch").permitAll()
             .anyRequest().hasAnyAuthority(getAllowedAuthorities()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }   
