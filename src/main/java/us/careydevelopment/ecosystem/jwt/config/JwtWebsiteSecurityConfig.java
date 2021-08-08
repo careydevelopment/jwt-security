@@ -4,15 +4,21 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 public abstract class JwtWebsiteSecurityConfig extends JwtOnlySecurityConfig {
+    
+    protected String[] permitAllUrls() {
+        String[] permitAll = { "/" };
+        return permitAll;
+    }
 
+    
     @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {              
+    protected void configure(HttpSecurity httpSecurity) throws Exception {    
         httpSecurity
             .cors().and()
             .csrf().disable()
             .addFilter(bearerTokenAuthenticationFilter())
             .authorizeRequests()
-            .antMatchers("/").permitAll()
+            .antMatchers(permitAllUrls()).permitAll()
             .antMatchers("/error/**").permitAll()
             .antMatchers("/blog/**").permitAll()
             .antMatchers("/about/**").permitAll()

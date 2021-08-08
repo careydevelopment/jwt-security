@@ -21,6 +21,12 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
     protected JwtUserDetailsService jwtUserDetailsService;
     protected IpTracker ipTracker;
     
+    
+    protected String[] permitAllUrls() {
+        String[] permitAll = { "/" };
+        return permitAll;
+    }
+    
         
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -77,6 +83,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
             .addFilter(credentialsAuthenticationFilter())
             .authorizeRequests()
             .antMatchers("/check/**").permitAll()
+            .antMatchers(permitAllUrls()).permitAll()
             .anyRequest().hasAnyAuthority(getAllowedAuthorities()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }   
