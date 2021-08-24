@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthen
 
 import us.careydevelopment.ecosystem.jwt.model.IpTracker;
 import us.careydevelopment.ecosystem.jwt.service.JwtUserDetailsService;
+import us.careydevelopment.ecosystem.jwt.util.RecaptchaUtil;
 
 /**
  * This class gets extended in the Spring Boot application
@@ -26,8 +27,11 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
         String[] permitAll = { "/" };
         return permitAll;
     }
+
     
-        
+    public abstract RecaptchaUtil recaptchaUtil();
+    
+    
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider);
@@ -69,6 +73,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
         filter.setJwtTokenUtil(jwtUtil);
         filter.setUserDetailsService(jwtUserDetailsService);
         filter.setIpTracker(ipTracker);
+        filter.recaptchaUtil = recaptchaUtil();
         
         return filter;
     }
