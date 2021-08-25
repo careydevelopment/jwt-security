@@ -7,6 +7,8 @@ public class JwtRequest {
     private String username;
     private String password;	
     private Boolean setCookie = false;
+    private String recaptchaResponse;
+    
 	
     public JwtRequest() { }
 
@@ -37,6 +39,16 @@ public class JwtRequest {
 
     public void setSetCookie(Boolean setCookie) {
         this.setCookie = setCookie;
+    }
+
+    
+    
+    public String getRecaptchaResponse() {
+        return recaptchaResponse;
+    }
+
+    public void setRecaptchaResponse(String recaptchaResponse) {
+        this.recaptchaResponse = recaptchaResponse;
     }
 
     public String toString() {
