@@ -21,7 +21,7 @@ import us.careydevelopment.util.date.DateConversionUtil;
 
 public abstract class JwtTokenUtil {
 
-    public static final long JWT_TOKEN_VALIDITY = DateConversionUtil.NUMBER_OF_MILLISECONDS_IN_DAY;
+    public static final int JWT_TOKEN_VALIDITY = (int)(DateConversionUtil.NUMBER_OF_MILLISECONDS_IN_DAY / 1000);
 	
     protected String jwtSecret;
 

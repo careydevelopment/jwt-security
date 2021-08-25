@@ -29,6 +29,7 @@ import us.careydevelopment.ecosystem.jwt.model.JwtResponse;
 import us.careydevelopment.ecosystem.jwt.service.JwtUserDetailsService;
 import us.careydevelopment.ecosystem.jwt.util.JwtTokenUtil;
 import us.careydevelopment.ecosystem.jwt.util.LoginAttemptsUtil;
+import us.careydevelopment.ecosystem.jwt.util.RecaptchaUtil;
 
 /**
  * Users asking for access with a name and password get here
@@ -41,6 +42,7 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     protected JwtTokenUtil jwtUtil;
     protected JwtUserDetailsService jwtUserDetailsService;
     protected IpTracker ipTracker;
+    protected RecaptchaUtil recaptchaUtil;
     
     private Boolean createCookie = false;
     
@@ -85,11 +87,15 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
             //construct the JwtRequest object from the input stream
             jwtRequest = mapper.readValue(req.getInputStream(), JwtRequest.class);
 
-            //now check to make sure this user hasn't had too many failed login attempts
-            loginAttemptsUtil.checkMaxLoginAttempts(jwtRequest);
-            
-            //handle login
-            return handleLogin(jwtRequest);
+            if (recaptchaCheck(jwtRequest)) {
+                //now check to make sure this user hasn't had too many failed login attempts
+                loginAttemptsUtil.checkMaxLoginAttempts(jwtRequest);
+                
+                //handle login
+                return handleLogin(jwtRequest);                    
+            } else {
+                throw new UserServiceAuthenticationException("Google thinks you're a bot");
+            }
         } catch (BadCredentialsException e) {
             LOG.error("Bad credentials!", e);
             
@@ -109,6 +115,19 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
         }
     }
 
+    
+    private boolean recaptchaCheck(JwtRequest jwtRequest) throws IOException {
+        boolean pass = true;
+        
+        if (recaptchaUtil != null) {
+            float score = recaptchaUtil.createAssessment(jwtRequest.getRecaptchaResponse());
+            pass = (score >= RecaptchaUtil.RECAPTCHA_MIN_SCORE);
+        }
+
+        return pass;
+    }
+    
+    
     
     /**
      * Uses the authentication manager to complete the login process
@@ -163,9 +182,10 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     private Cookie createCookie(final String content) {
         final Cookie cookie = new Cookie(CookieConstants.ACCESS_TOKEN_COOKIE_NAME, content);
         
-        cookie.setMaxAge((int)JwtTokenUtil.JWT_TOKEN_VALIDITY);
+        cookie.setMaxAge(JwtTokenUtil.JWT_TOKEN_VALIDITY) ;
         cookie.setHttpOnly(true);
         cookie.setPath("/");
+        cookie.setSecure(true);
                 
         return cookie;
     }
