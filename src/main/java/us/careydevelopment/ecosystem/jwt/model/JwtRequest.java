@@ -2,11 +2,15 @@ package us.careydevelopment.ecosystem.jwt.model;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class JwtRequest {
 	
     private String username;
     private String password;	
     private Boolean setCookie = false;
+    
+    @JsonProperty(value="g-recaptcha-response")
     private String recaptchaResponse;
     
 	
