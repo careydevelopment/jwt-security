@@ -119,10 +119,10 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     private boolean recaptchaCheck(JwtRequest jwtRequest) throws IOException {
         boolean pass = true;
         
-        if (recaptchaUtil != null) {
-            float score = recaptchaUtil.createAssessment(jwtRequest.getRecaptchaResponse());
-            pass = (score >= RecaptchaUtil.RECAPTCHA_MIN_SCORE);
-        }
+//        if (recaptchaUtil != null) {
+//            float score = recaptchaUtil.createAssessment(jwtRequest.getRecaptchaResponse());
+//            pass = (score >= RecaptchaUtil.RECAPTCHA_MIN_SCORE);
+//        }
 
         return pass;
     }
@@ -182,7 +182,7 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     private Cookie createCookie(final String content) {
         final Cookie cookie = new Cookie(CookieConstants.ACCESS_TOKEN_COOKIE_NAME, content);
         
-        cookie.setMaxAge(JwtTokenUtil.JWT_TOKEN_VALIDITY) ;
+        cookie.setMaxAge(JwtTokenUtil.COOKIE_TOKEN_VALIDITY) ;
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setSecure(true);
