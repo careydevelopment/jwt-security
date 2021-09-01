@@ -1,5 +1,7 @@
 package us.careydevelopment.ecosystem.jwt.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,6 +20,8 @@ import us.careydevelopment.ecosystem.jwt.util.RecaptchaUtil;
  * Handles security config for applications that support user login and JWT 
  */
 public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig  {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(CredentialsAndJwtSecurityConfig.class);
 
     protected JwtUserDetailsService jwtUserDetailsService;
     protected IpTracker ipTracker;
@@ -36,6 +40,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        LOG.debug("In configure global");
         auth.authenticationProvider(authenticationProvider);
         auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
     }
@@ -56,6 +61,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
      * @throws Exception
      */
     protected BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter() throws Exception {
+        LOG.debug("In bearerTokenAuthenticationFilter");
         BearerTokenAuthenticationFilter filter = new BearerTokenAuthenticationFilter(authenticationManager());
         filter.setAuthenticationFailureHandler(authenticationFailureHandler());
             
@@ -70,6 +76,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
      * @throws Exception
      */
     protected CredentialsAuthenticationFilter credentialsAuthenticationFilter() throws Exception {
+        LOG.debug("In credentialsauthenticationfilter");
         CredentialsAuthenticationFilter filter = new CredentialsAuthenticationFilter(authenticationManager());
         filter.setAuthenticationFailureHandler(authenticationFailureHandler());
         filter.setJwtTokenUtil(jwtUtil);

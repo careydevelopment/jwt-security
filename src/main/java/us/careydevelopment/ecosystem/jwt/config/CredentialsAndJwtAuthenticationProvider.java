@@ -29,12 +29,14 @@ public abstract class CredentialsAndJwtAuthenticationProvider implements Authent
     
     @Override
     public boolean supports(Class<?> authentication) {
+        LOG.debug("In supports");
         return authentication.equals(BearerTokenAuthenticationToken.class);
     }
     
     
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        LOG.debug("In authenticate");
         BearerTokenAuthenticationToken bearerToken = (BearerTokenAuthenticationToken) authentication;
         Authentication auth = null;
         
@@ -51,10 +53,13 @@ public abstract class CredentialsAndJwtAuthenticationProvider implements Authent
             auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());            
             LOG.debug("Authentication token: " + auth);            
         } catch (IllegalArgumentException e) {
+            LOG.debug("IllegalArgumentException", e);
             throw new UserServiceAuthenticationException("Invalid token");
         } catch (ExpiredJwtException e) {
+            LOG.debug("ExpiredJtw", e);
             throw new UserServiceAuthenticationException("Token expired");
         } catch (SignatureException e) {
+            LOG.debug("SignatureException", e);
             throw new UserServiceAuthenticationException("Invalid signature");
         }
         

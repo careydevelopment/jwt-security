@@ -54,12 +54,14 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
      * @param jwtUtil - Spring-managed component
      */
     public CredentialsAuthenticationFilter(AuthenticationManager man) {
+        LOG.debug("In CredentialsAuthenticationFilter constructor");
         this.authenticationManager = man;        
         this.setFilterProcessesUrl("/authenticate");
     }
 
     
     public void setJwtTokenUtil(JwtTokenUtil jwtUtil) {
+        LOG.debug("Setting jwt token");
         this.jwtUtil = jwtUtil;
     }
     
@@ -76,18 +78,21 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
+        LOG.debug("Attempting authentication");
         JwtRequest jwtRequest = null;
         ObjectMapper mapper = new ObjectMapper();
         LoginAttemptsUtil loginAttemptsUtil = new LoginAttemptsUtil(jwtUserDetailsService, ipTracker);
         
         try {
             //make sure the user hasn't failed login too many times from this IP address
+            LOG.debug("Checking if the user failed login too many times");
             loginAttemptsUtil.checkIpValidity(req);            
 
             //construct the JwtRequest object from the input stream
             jwtRequest = mapper.readValue(req.getInputStream(), JwtRequest.class);
 
             if (recaptchaCheck(jwtRequest)) {
+                LOG.debug("Handling recaptcha");
                 //now check to make sure this user hasn't had too many failed login attempts
                 loginAttemptsUtil.checkMaxLoginAttempts(jwtRequest);
                 
@@ -117,12 +122,13 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
 
     
     private boolean recaptchaCheck(JwtRequest jwtRequest) throws IOException {
+        LOG.debug("In recaptcha check");
         boolean pass = true;
         
-        if (recaptchaUtil != null) {
-            float score = recaptchaUtil.createAssessment(jwtRequest.getRecaptchaResponse());
-            pass = (score >= RecaptchaUtil.RECAPTCHA_MIN_SCORE);
-        }
+//        if (recaptchaUtil != null) {
+//            float score = recaptchaUtil.createAssessment(jwtRequest.getRecaptchaResponse());
+//            pass = (score >= RecaptchaUtil.RECAPTCHA_MIN_SCORE);
+//        }
 
         return pass;
     }
@@ -134,6 +140,7 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
      * Will throw an exception if the credentials aren't valid.
      */
     private Authentication handleLogin(JwtRequest jwtRequest) {
+        LOG.debug("Handling login");
         Authentication auth = null;
         
         if (jwtRequest != null) {
@@ -143,6 +150,7 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
             auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     jwtRequest.getUsername(), jwtRequest.getPassword()));
         } else {
+            LOG.debug("Problem getting login credentials");
             throw new UserServiceAuthenticationException("Problem getting login credentials!");
         }
         
@@ -154,6 +162,8 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, 
             FilterChain chain, Authentication auth) throws IOException {
 
+        LOG.debug("Successful Authentication");
+        
         final BaseUser user = (BaseUser)auth.getPrincipal();
         final String token = jwtUtil.generateToken(user);
         final Long expirationDate = jwtUtil.getExpirationDateFromToken(token).getTime();
@@ -180,9 +190,10 @@ public class CredentialsAuthenticationFilter extends UsernamePasswordAuthenticat
     
     
     private Cookie createCookie(final String content) {
+        LOG.debug("Creating cookie");
         final Cookie cookie = new Cookie(CookieConstants.ACCESS_TOKEN_COOKIE_NAME, content);
         
-        cookie.setMaxAge(JwtTokenUtil.JWT_TOKEN_VALIDITY) ;
+        cookie.setMaxAge(JwtTokenUtil.COOKIE_TOKEN_VALIDITY) ;
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setSecure(true);

@@ -31,12 +31,14 @@ public abstract class JwtOnlyAuthenticationProvider implements AuthenticationPro
     
     @Override
     public boolean supports(Class<?> authentication) {
+        LOG.debug("In supports jwt only");
         return authentication.equals(BearerTokenAuthenticationToken.class);
     }
     
     
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        LOG.debug("Attempting authentication jwt only");
         BearerTokenAuthenticationToken bearerToken = (BearerTokenAuthenticationToken) authentication;
         Authentication auth = null;
         
@@ -52,13 +54,13 @@ public abstract class JwtOnlyAuthenticationProvider implements AuthenticationPro
             auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
             LOG.debug("Authentication token: " + auth);            
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            LOG.debug("Problem authentication", e);
             throw new UserServiceAuthenticationException("Invalid token");
         } catch (ExpiredJwtException e) {
-            e.printStackTrace();
+            LOG.debug("Expired token", e);
             throw new UserServiceAuthenticationException("Token expired");
         } catch (SignatureException e) {
-            e.printStackTrace();
+            LOG.debug("Signature issue", e);
             throw new UserServiceAuthenticationException("Invalid signature");
         }
         
