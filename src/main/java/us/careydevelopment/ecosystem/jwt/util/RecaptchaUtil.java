@@ -23,7 +23,6 @@ public class RecaptchaUtil {
 
     private String projectID;    
     private String siteKey;
-
     
     public RecaptchaUtil(String projectID, String siteKey) {
         this.projectID = projectID;
