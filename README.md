@@ -3,7 +3,7 @@
 # Carey Development JWT Security 
 ![](https://img.shields.io/badge/jdk-11-blue.svg) ![license](https://img.shields.io/badge/license-MIT-blue.svg) 
 ![](https://img.shields.io/badge/maven-3.6.3-blue.svg)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/us.careydevelopment.ecosystem/jwt-security/badge.svg)](https://search.maven.org/artifact/us.careydevelopment.ecosystem/jwt-security/2.1.0/jar)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/us.careydevelopment.ecosystem/jwt-security/badge.svg)](https://search.maven.org/artifact/us.careydevelopment.ecosystem/jwt-security/2.2.0/jar)
 
 
 
@@ -18,7 +18,7 @@ You can pull it from the central Maven repositories:
  <dependency>
     <groupId>us.careydevelopment.ecosystem</groupId>
     <artifactId>jwt-security</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
  </dependency>
 ```
 
