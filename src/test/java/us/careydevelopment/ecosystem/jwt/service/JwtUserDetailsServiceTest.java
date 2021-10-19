@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import us.careydevelopment.ecosystem.jwt.harness.UserDetailsHarness;
 import us.careydevelopment.ecosystem.jwt.repository.UserDetailsRepository;
@@ -49,6 +50,16 @@ public class JwtUserDetailsServiceTest {
        
        Assertions.assertEquals(UserDetailsHarness.VALID_USERNAME, returnedUser.getUsername());
        Assertions.assertEquals(UserDetailsHarness.VALID_PASSWORD, returnedUser.getPassword());
+    }
+    
+    @Test
+    public void testLoadUserByUsernameNoMatch() {
+       final String username = UserDetailsHarness.VALID_EMAIL_ADDRESS;
+       
+       Mockito.when(repo.findByUsername(username)).thenReturn(null);
+       Mockito.when(repo.findByEmail(username)).thenReturn(null);
+       
+       Assertions.assertThrows(UsernameNotFoundException.class, () -> service.loadUserByUsername(username));
     }
     
     private static class UserDetailsServiceImpl extends JwtUserDetailsService {

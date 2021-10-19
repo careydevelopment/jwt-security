@@ -21,106 +21,88 @@ import us.careydevelopment.util.date.DateConversionUtil;
 
 public abstract class JwtTokenUtil {
 
-    public static final int COOKIE_TOKEN_VALIDITY = (int)(DateConversionUtil.NUMBER_OF_MILLISECONDS_IN_DAY / 1000);
+    public static final int COOKIE_TOKEN_VALIDITY = (int) (DateConversionUtil.NUMBER_OF_MILLISECONDS_IN_DAY / 1000);
     public static final long JWT_TOKEN_VALIDITY = DateConversionUtil.NUMBER_OF_MILLISECONDS_IN_DAY;
-    
+
     protected String jwtSecret;
 
-    
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(Claims::getSubject, token);
     }
 
-	
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(Claims::getExpiration, token);
     }
 
-
     public <T> T getClaimFromToken(Function<Claims, T> claimsResolver, String token) {
         final Claims claims = getAllClaimsFromToken(token);
-            return claimsResolver.apply(claims);
+        return claimsResolver.apply(claims);
     }
-	
-	
+
     public String getClaimFromTokenByName(String name, String token) {
         final Claims claims = getAllClaimsFromToken(token);
-        return (String)claims.get(name);
+        return (String) claims.get(name);
     }
-	
-	
+
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
     }
 
-	
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
-	
     public String generateToken(BaseUser user) {
-        Map<String, Object> claims = addClaims(user); 
+        Map<String, Object> claims = addClaims(user);
         return doGenerateToken(claims, user.getUsername());
     }
 
-	
     private Map<String, Object> addClaims(BaseUser user) {
         Map<String, Object> claims = new HashMap<String, Object>();
-		
+
         claims.put("id", user.getId());
         claims.put("authorities", user.getAuthorityNames());
-		
-        return claims;
-    }	
 
-	
+        return claims;
+    }
+
     private String doGenerateToken(Map<String, Object> claims, String subject) {
-        String token = Jwts.builder()
-                        .setClaims(claims)
-                        .setSubject(subject)
-                        .setIssuedAt(new Date(System.currentTimeMillis()))
-                        .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                        .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
-		
+        String token = Jwts.builder().setClaims(claims).setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+
         return token;
     }
 
-	
     public Boolean validateToken(UserDetails userDetails, String token) {
         final String username = getUsernameFromToken(token);
-	return (userDetails != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (userDetails != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-	
-	
+
     public Boolean validateToken(String token) {
         return (!isTokenExpired(token));
     }
-	
-    
-    //no return necessary as this will throw an exception if there's a problem
+
+    // no return necessary as this will throw an exception if there's a problem
     public void validateTokenWithSignature(String token) {
         Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
     }
-    
-    
+
     public Collection<? extends GrantedAuthority> getAuthorities(String token) {
         Jws<Claims> jwsClaims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
         Claims claims = jwsClaims.getBody();
-        Collection<? extends GrantedAuthority> authorities = getAuthorities(claims); 
-        
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(claims);
+
         return authorities;
     }
-    
-    
+
     private Collection<? extends GrantedAuthority> getAuthorities(Claims claims) {
         List<String> authorityNames = (List<String>) claims.get("authorities");
-        
-        Collection<? extends GrantedAuthority> authorities = authorityNames
-            .stream()
-            .map(auth -> new SimpleGrantedAuthority(auth))
-            .collect(Collectors.toList());
+
+        Collection<? extends GrantedAuthority> authorities = authorityNames.stream()
+                .map(auth -> new SimpleGrantedAuthority(auth)).collect(Collectors.toList());
 
         return authorities;
     }

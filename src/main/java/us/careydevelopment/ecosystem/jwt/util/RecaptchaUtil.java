@@ -13,27 +13,28 @@ import com.google.recaptchaenterprise.v1.ProjectName;
 import com.google.recaptchaenterprise.v1.RiskAnalysis.ClassificationReason;
 
 public class RecaptchaUtil {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(RecaptchaUtil.class);
 
-    
     public static final float RECAPTCHA_MIN_SCORE = 0.8f;
-    
+
     private static final String ACTION = "submit";
 
-    private String projectID;    
+    private String projectID;
     private String siteKey;
-    
+
     public RecaptchaUtil(String projectID, String siteKey) {
         this.projectID = projectID;
         this.siteKey = siteKey;
-    }    
-    
+    }
+
     public float createAssessment(String token) throws IOException {
         float recaptchaScore = 0f;
-        
-        // Initialize a client that will be used to send requests. This client needs to be created only
-        // once, and can be reused for multiple requests. After completing all of your requests, call
+
+        // Initialize a client that will be used to send requests. This client needs to
+        // be created only
+        // once, and can be reused for multiple requests. After completing all of your
+        // requests, call
         // the `client.close()` method on the client to safely
         // clean up any remaining background resources.
         try (RecaptchaEnterpriseServiceClient client = RecaptchaEnterpriseServiceClient.create()) {
@@ -41,30 +42,26 @@ public class RecaptchaUtil {
             String assessmentName = "assessment-name";
 
             // Set the properties of the event to be tracked.
-            Event event = Event.newBuilder()
-                                  .setSiteKey(siteKey)
-                                  .setToken(token)
-                                  .build();
+            Event event = Event.newBuilder().setSiteKey(siteKey).setToken(token).build();
 
             // Build the assessment request.
             CreateAssessmentRequest createAssessmentRequest = CreateAssessmentRequest.newBuilder()
-                                                                .setParent(ProjectName.of(projectID).toString())
-                                                                .setAssessment(Assessment.newBuilder().setEvent(event).setName(assessmentName).build())
-                                                                .build();
+                    .setParent(ProjectName.of(projectID).toString())
+                    .setAssessment(Assessment.newBuilder().setEvent(event).setName(assessmentName).build()).build();
 
             Assessment response = client.createAssessment(createAssessmentRequest);
 
             // Check if the token is valid.
             if (!response.getTokenProperties().getValid()) {
-                LOG.error("The CreateAssessment call failed because the token was: " +
-                          response.getTokenProperties().getInvalidReason().name());
+                LOG.error("The CreateAssessment call failed because the token was: "
+                        + response.getTokenProperties().getInvalidReason().name());
                 return recaptchaScore;
             }
 
             // Check if the expected action was executed.
             if (!response.getTokenProperties().getAction().equals(ACTION)) {
-                LOG.error("The action attribute in your reCAPTCHA tag " +
-                          "does not match the action you are expecting to score");
+                LOG.error("The action attribute in your reCAPTCHA tag "
+                        + "does not match the action you are expecting to score");
                 return recaptchaScore;
             }
 
@@ -78,8 +75,8 @@ public class RecaptchaUtil {
                 LOG.debug("Reason is " + reason);
             }
         }
-        
+
         return recaptchaScore;
     }
-    
+
 }
