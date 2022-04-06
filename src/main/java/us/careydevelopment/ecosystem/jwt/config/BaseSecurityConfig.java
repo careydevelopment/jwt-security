@@ -31,7 +31,7 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
 
     //this can be overridden in the child class
     //TODO: probably use an ecosystem generic user rather than CRM-specific
-    private String[] allowedAuthorities = { Authority.CRM_USER };    
+    private String[] allowedAuthorities = { Authority.CRM_USER, Authority.BASIC_ECOSYSTEM_USER };    
     
     protected AuthenticationProvider authenticationProvider;
     protected JwtTokenUtil jwtUtil;

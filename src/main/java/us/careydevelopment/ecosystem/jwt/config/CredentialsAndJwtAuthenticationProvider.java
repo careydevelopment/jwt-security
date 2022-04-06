@@ -30,7 +30,9 @@ public abstract class CredentialsAndJwtAuthenticationProvider implements Authent
     @Override
     public boolean supports(Class<?> authentication) {
         LOG.debug("In supports");
-        return authentication.equals(BearerTokenAuthenticationToken.class);
+        boolean b = authentication.equals(BearerTokenAuthenticationToken.class);
+        
+        return b;
     }
     
     
