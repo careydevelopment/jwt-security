@@ -70,6 +70,7 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
     
     
     /**
+    
      * This filter handles name/password authentication
      * 
      * @return credentialsAuthenticationFilter
@@ -96,7 +97,11 @@ public abstract class CredentialsAndJwtSecurityConfig extends BaseSecurityConfig
             .addFilter(bearerTokenAuthenticationFilter())
             .addFilter(credentialsAuthenticationFilter())
             .authorizeRequests()
+            
+            //used to check if the registering user is using a 
+            //duplicate username or email address
             .antMatchers("/check/**").permitAll()
+            
             .antMatchers(permitAllUrls()).permitAll()
             .anyRequest().hasAnyAuthority(getAllowedAuthorities()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
